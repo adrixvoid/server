@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: always
+    platform: linux/amd64
+    # read .env file
+    env_file: ./.env
+    environment:
+      # MYSQL_ROOT_PASSWORD: $MYSQL_DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DB_DATABASE
+      MYSQL_USER: $MYSQL_DB_USER
+      MYSQL_PASSWORD: $MYSQL_DB_PASSWORD
+    ports:
+      - $MYSQL_DB_EXTERNAL_PORT:$MYSQL_DB_INTERNAL_PORT
+    volumes:
+      - ./mysql:/var/lib/mysql
+  api:
+    env_file: ./.env
+    # it reads Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    # wait for mysqldb to be ready
+    depends_on:
+      - mysqldb
+    # relation between containers
+    links:
+      - mysqldb
+    # port to access the server
+    ports:
+      - $API_EXTERNAL_PORT:$API_INTERNAL_PORT
+  media:
+    env_file: ./.env
+    # it reads Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile-media
+    # port to access the server
+    ports:
+      - $MEDIA_EXTERNAL_PORT:$MEDIA_INTERNAL_PORT
