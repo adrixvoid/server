@@ -5,4 +5,10 @@ COPY ./api/package.json .
 RUN npm install
 
 COPY ./api .
-CMD npm start
+
+ARG NODE_ENV
+
+RUN echo "NODE_ENV: $NODE_ENV"
+
+RUN if [ "$NODE_ENV" = "production" ] ; then npm run build ; fi
+CMD if [ "$NODE_ENV" = "production" ] ; then npm start ; else npm run dev ; fi

@@ -22,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-api
+      args:
+        - NODE_ENV=${NODE_ENV}
     # wait for mysqldb to be ready
     depends_on:
       - mysqldb
@@ -31,6 +33,8 @@ services:
     # port to access the server
     ports:
       - $API_EXTERNAL_PORT:$API_INTERNAL_PORT
+    volumes:
+      - ./api/src:/app/src
   media:
     env_file: ./.env
     # it reads Dockerfile
@@ -40,3 +44,5 @@ services:
     # port to access the server
     ports:
       - $MEDIA_EXTERNAL_PORT:$MEDIA_INTERNAL_PORT
+    expose:
+      - $MEDIA_EXTERNAL_PORT

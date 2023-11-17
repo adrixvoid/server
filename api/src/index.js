@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 config()
 
 const PORT_FALLBACK = 2000;
+const PORT = process.env.API_INTERNAL_PORT || PORT_FALLBACK;
 
 const app = express();
 
@@ -31,7 +32,7 @@ app.get('/ping', async (_, res) => {
     res.json(result[0]);
 });
 
-app.listen(process.env.API_INTERNAL_PORT || PORT_FALLBACK, () => {
-    console.log('\x1b[32m%s\x1b[0m', 'listening on port', process.env.API_INTERNAL_PORT || PORT_FALLBACK);
+app.listen(PORT, () => {
+    console.log('\x1b[32m%s\x1b[0m', `API server listening on port http://locahost:${PORT}`);
     console.log('\x1b[32m%s\x1b[0m', 'external port', process.env.API_EXTERNAL_PORT);
 });
