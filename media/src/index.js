@@ -1,21 +1,18 @@
+require('dotenv').config()
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const ansis = require('ansis');
-const { isValidExtension, generateNewFilename, checkPublicDirectoryExist, deleteFile, getImageMetadata, getFileMetadata } = require('../utils/utils');
-require('dotenv').config()
+const { isValidExtension, generateNewFilename, checkPublicDirectoryExist, deleteFile, getFileMetadata } = require('./utils');
+const { PUBLIC_PATH, UPLOAD_PATH } = require('./constants');
 
 const PORT = process.env.MEDIA_INTERNAL_PORT || 2001;
 const app = express();
 
 // Middleware para analizar el cuerpo de las solicitudes (para el manejo de archivos)
 app.use(bodyParser.json());
-
-// Directory where files are stored
-const PUBLIC_PATH = process.env.MEDIA_PUBLIC_PATH || 'public';
-const UPLOAD_PATH = process.env.MEDIA_UPLOAD_PATH || 'public/uploads';
 
 checkPublicDirectoryExist(PUBLIC_PATH)
 
@@ -31,10 +28,18 @@ const storage = multer.diskStorage({
         cb(null, UPLOAD_PATH);
     },
     filename: (req, file, cb) => {
-        if (file.originalname) {
-            cb(null, generateNewFilename(file.originalname));
-        } else {
-            cb(new Error('Original-name is not defined'));
+        try {
+            if (!file) {
+                throw new Error('No file attached');
+            }
+
+            if (file.originalname) {
+                cb(null, generateNewFilename(file.originalname));
+            } else {
+                throw new Error('Original-name is not defined')
+            }
+        } catch (error) {
+            cb(error);
         }
     },
 });
@@ -51,7 +56,6 @@ const fileFilter = (req, file, cb) => {
 
         cb(null, true);
     } catch (error) {
-        fs.unlinkSync(path.join(UPLOAD_PATH, file.originalname))
         cb(error, false);
     }
 };
@@ -66,7 +70,7 @@ const upload = multer({
 
 // Route to upload a file
 app.post('/upload', (req, res) => {
-    upload.array('files')(req, res, async (err) => {
+    return upload.array('files')(req, res, async (err) => {
         if (err) {
             res.status(400).json({ success: false, error: err.message });
             return;
@@ -82,23 +86,22 @@ app.post('/upload', (req, res) => {
 
         for (const file of files) {
             try {
-                const metadata = getImageMetadata(path.join(UPLOAD_PATH, file.filename));
+                const metadata = getFileMetadata(file);
 
                 result.push({
                     success: true,
                     status: 200,
                     file,
-                    data: metadata,
+                    metadata: metadata,
                 });
             } catch (error) {
-                fs.unlink(file.filename)
+                // fs.unlink(file.path)
                 result.push({
                     success: false,
                     message: error.message,
-                    filename: file.filename,
                     status: 400,
+                    file,
                 });
-                res.status(400);
             }
         }
 
@@ -115,9 +118,9 @@ app.get('/metadata/:filename', (req, res) => {
             throw new Error('Invalid file extension');
         }
 
-        const metadata = getFileMetadata(filename);
+        const file = fs.readFileSync(path.join(UPLOAD_PATH, filename));
 
-        console.log({ metadata })
+        const metadata = getFileMetadata(file);
 
         res.json({ success: true, metadata });
     } catch (error) {

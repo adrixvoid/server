@@ -49,7 +49,33 @@ async function createExampleFile(exampleFileName) {
     })
 }
 
-// delete directy
+/**
+ * Get an example file for testing purposes
+ * @param {string} exampleFileName
+ * @returns {Promise<string>}
+ * @example
+ * const example = await getExampleFile("example.jpg")
+ * console.log(example)
+ */
+async function getExampleFile(exampleFileName = "example.jpg") {
+    return new Promise(async (resolve, reject) => {
+        try {
+            fs.readFile(`public/test/example/${exampleFileName}`, 'utf8', (err, data) => {
+                if (err) {
+                    console.error('An error occurred:', err);
+                    return;
+                }
+
+                resolve(data);
+            });
+        } catch (error) {
+            console.log("error", error.message)
+            reject({ error: error.message });
+        }
+    })
+}
+
+// delete directly
 // fs.rmdirSync(process.env.MEDIA_UPLOAD_PATH, { recursive: true });
 /**
  * Delete an example file
@@ -74,6 +100,7 @@ async function deleteExampleFile(filename) {
 
 module.exports = {
     getExamplePath,
+    getExampleFile,
     createExampleFile,
     deleteExampleFile,
 };

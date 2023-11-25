@@ -1,6 +1,7 @@
 const fs = require('fs');
 const sizeOf = require('image-size');
-const { getExtension, isValidExtension, isImageExtension, generateNewFilename, renameFile, getImageMetadata } = require('../utils/utils');
+const { getExtension, isValidExtension, isImageExtension, generateNewFilename, renameFile, getImageMetadata } = require('../src/utils');
+const { server } = require('../src/index');
 
 jest.mock('image-size');
 jest.mock('fs');
@@ -8,6 +9,7 @@ jest.mock('fs');
 describe('Utils', () => {
     afterEach(() => {
         jest.clearAllMocks();
+        server.close();
     });
 
     describe('getExtension', () => {

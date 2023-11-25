@@ -27,8 +27,13 @@ app.get('/', (req, res) => {
     res.send('Api server ready!');
 });
 
-app.get('/ping', async (_, res) => {
+app.get('/ping', async (req, res) => {
     const result = await pool.query('SELECT NOW()');
+    res.json(result[0]);
+});
+
+app.get('/post/create', async (req, res) => {
+    console.log("req.body", req.body)
     res.json(result[0]);
 });
 

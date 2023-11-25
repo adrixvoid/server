@@ -5,4 +5,6 @@ COPY ./media/package.json .
 RUN npm install
 
 COPY ./media .
-CMD npm start
+
+CMD if [ "$NODE_ENV" = "production" ] ; then npm start ; else npm run dev ; fi
+# CMD npm start

@@ -46,3 +46,6 @@ services:
       - $MEDIA_EXTERNAL_PORT:$MEDIA_INTERNAL_PORT
     expose:
       - $MEDIA_EXTERNAL_PORT
+    volumes:
+      - ./media/src:/app/src
+      - ./media/public/:/app/public

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sizeOf = require('image-size');
+const { PUBLIC_PATH } = require('./constants');
 
 const IMAGE_EXTENSION = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
 // Video/image/audio extensions
@@ -74,6 +75,7 @@ function generateNewFilename(oldName) {
         const extension = path.extname(oldName);
         return `${timestamp}_${parsedName}${extension}`;
     } catch (error) {
+        console.log(error.message)
         return oldName;
     }
 }
@@ -137,15 +139,25 @@ function getImageMetadata(filePath) {
  * @param {string} filepath
  * @returns {{ src: string, width?: number, height?: number, type?: string }}
  * @see https://www.npmjs.com/package/image-size
+ * type file: {
+        fieldname: 'files',
+        originalname: 'example.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: 'public/test/uploads',
+        filename: '20231124190354458_example.jpg',
+        path: 'public/test/uploads/20231124190354458_example.jpg',
+        size: 1056
+    },
  */
-function getFileMetadata(filepath) {
+function getFileMetadata(file) {
     const metadata = {
-        src: filepath,
+        path: file.path?.replace(PUBLIC_PATH, '')
     };
 
-    if (isImageExtension(filepath)) {
-        const metadataImageFile = getImageMetadata(filepath);
-        Object.assign(metadata, ...metadataImageFile);
+    if (isImageExtension(file.filename)) {
+        const imageMetadata = getImageMetadata(file.path);
+        Object.assign(metadata, imageMetadata);
     }
 
     return metadata;
