@@ -15,7 +15,6 @@ function getExamplePath(exampleFileName) {
  * @returns {Promise<{ exist: boolean, filename: string, relativePath: string, fullPath: string }>}
  * @example
  * const example = await createExampleFile("example.jpg")
- * console.log(example)
  * // {
  * //     exist: true,
  * //     filename: 'example.jpg',
@@ -43,7 +42,6 @@ async function createExampleFile(exampleFileName) {
                 ...examplePath
             });
         } catch (error) {
-            console.log("error", error.message)
             reject({ error: error.message });
         }
     })
@@ -55,10 +53,9 @@ async function createExampleFile(exampleFileName) {
  * @returns {Promise<string>}
  * @example
  * const example = await getExampleFile("example.jpg")
- * console.log(example)
  */
 async function getExampleFile(exampleFileName = "example.jpg") {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         try {
             fs.readFile(`public/test/example/${exampleFileName}`, 'utf8', (err, data) => {
                 if (err) {
@@ -69,7 +66,6 @@ async function getExampleFile(exampleFileName = "example.jpg") {
                 resolve(data);
             });
         } catch (error) {
-            console.log("error", error.message)
             reject({ error: error.message });
         }
     })

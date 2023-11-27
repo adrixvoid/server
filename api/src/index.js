@@ -1,27 +1,20 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import { createPool } from 'mysql2/promise';
 import { config } from 'dotenv';
-config()
+config();
 
 const PORT_FALLBACK = 2000;
 const PORT = process.env.API_INTERNAL_PORT || PORT_FALLBACK;
 
 const app = express();
+app.use(express.json());
 
 const pool = createPool({
-    // localhost is for non-container environment
-    // host: 'localhost',
-    // mysqldb is for container environment, the name given in docker-compose.yml
     host: process.env.MYSQL_DB_HOST,
     user: process.env.MYSQL_DB_USER,
     password: process.env.MYSQL_DB_PASSWORD,
-    // 3307 is the default port outside docker
-    // 3306 is the default port for MySQL in Docker
     port: process.env.MYSQL_DB_INTERNAL_PORT
 });
-
-app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
     res.send('Api server ready!');
@@ -32,9 +25,15 @@ app.get('/ping', async (req, res) => {
     res.json(result[0]);
 });
 
-app.get('/post/create', async (req, res) => {
-    console.log("req.body", req.body)
-    res.json(result[0]);
+app.post('/post/create', async (req, res) => {
+    const QUERY = `INSERT INTO webapp_db.Post (id, title, content, createdAt, updatedAt) VALUES (NULL, "${req.body.project}", "${req.body.description}", NOW(), NOW())`;
+    const result = await pool.query(QUERY);
+
+    res.status(200).json({
+        success: false,
+        result,
+        body: req.body
+    });
 });
 
 app.listen(PORT, () => {

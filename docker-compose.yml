@@ -35,6 +35,7 @@ services:
       - $API_EXTERNAL_PORT:$API_INTERNAL_PORT
     volumes:
       - ./api/src:/app/src
+      - ./api/prisma:/app/prisma
   media:
     env_file: ./.env
     # it reads Dockerfile

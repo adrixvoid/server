@@ -129,7 +129,6 @@ describe('Utils', () => {
             });
 
             const metadata = getImageMetadata('path/to/file.jpg');
-            console.log("metadata", metadata)
 
             expect(metadata).toEqual({
                 width: 100,

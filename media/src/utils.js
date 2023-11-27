@@ -68,15 +68,15 @@ function checkPublicDirectoryExist(directoryPath) {
  * @param {string} oldName
  * @returns {string}
  */
-function generateNewFilename(oldName) {
+function generateNewFilename(originalName) {
     try {
+        // cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
         const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '');
-        const parsedName = path.parse(oldName).name;
-        const extension = path.extname(oldName);
+        const parsedName = path.parse(originalName).name;
+        const extension = path.extname(originalName);
         return `${timestamp}_${parsedName}${extension}`;
     } catch (error) {
-        console.log(error.message)
-        return oldName;
+        return originalName;
     }
 }
 
